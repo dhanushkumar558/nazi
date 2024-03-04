@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>things</title>
+</head>
+<body>
+    <button id="add1" onclick="addusers()">add employee</button>
+    <form action="/add" method="post">
+        <div id="hey" style="display:none;">
+             <input type="text" id="name" name="name" placeholder="name">
+        <input type="text" id="username" name="username" placeholder="username">
+        <button type="submit" onclick="buttony()">Add</button></div>
+    </form>
+    <button id="show" onclick="button1()">show tables</button>
+    <table id="table1" style="display:none;">
+        <thead>
+            <tr>
+                <th>name</th>
+                <th>username</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchData();
+        });
+    
+        function fetchData() {
+            fetch('/getData')
+                .then(response => response.json())
+                .then(data => {
+                    renderData(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+    
+        function renderData(data) {
+    var tablebody = document.querySelector("#table1 tbody");
+    data.forEach(item => {
+        var row = tablebody.insertRow();
+        var cel1 = row.insertCell(0);
+        var cel2 = row.insertCell(1);
+        var cel3 = row.insertCell(2);
+        cel1.textContent = item.name;
+        cel2.textContent = item.username;
+        cel3.innerHTML = '<button onclick="deleteRowAndData(this, ' + item.id + ')">Delete</button>';
+    });
+}
+
+function buttony(event) {
+    event.preventDefault();
+    var name = document.getElementById("name").value;
+    var username = document.getElementById("username").value;
+
+    if (name && username) {
+        var tablebody = document.querySelector("#table1 tbody");
+        var row = tablebody.insertRow();
+        var cel1 = row.insertCell(0);
+        var cel2 = row.insertCell(1);
+        var cel3 = row.insertCell(2);
+        // Use a unique identifier provided by the server
+        var id = Math.floor(Math.random() * 1000); // Example: Use a random number (you should replace this)
+        cel1.textContent = name;
+        cel2.textContent = username;
+        cel3.innerHTML = '<button onclick="deleteRowAndData(this, ' + id + ')">Delete</button>';
+     window.location.href="index.html";
+    }
+}
+
+
+    
+        function deleteRowAndData(button, id) {
+            var row = button.parentNode.parentNode;
+            row.remove();
+    
+            // Send DELETE request to server
+            fetch('/delete/' + id, {
+                method: 'DELETE',
+            }).then(response => {
+                if (response.ok) {
+                    console.log('Row deleted from server');
+                } else {
+                    console.error('Failed to delete row from server');
+                }
+            }).catch(error => {
+                console.error('Error deleting row:', error);
+            });
+        }
+
+        function button1() {
+            var table = document.getElementById("table1");
+            var showButton = document.getElementById("show");
+
+            if (table.style.display == "none") {
+                table.style.display = "table";
+                showButton.textContent = "Hide Table";
+            } else {
+                table.style.display = "none";
+                showButton.textContent = "Show Table";
+            }
+        }
+        function addusers() {
+          
+
+    var boxed = document.getElementById("hey");
+    var showButton = document.getElementById("add1");
+
+    if (boxed.style.display === "none") {
+        boxed.style.display = "block";  // Change to "block" instead of "boxed"
+        showButton.textContent = "close employee";
+    } else {
+        boxed.style.display = "none";
+        showButton.textContent = "add employee";
+    }
+}
+
+    </script>
+    
+    
+</body>
+</html>
